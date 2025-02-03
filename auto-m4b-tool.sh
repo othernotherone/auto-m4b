@@ -124,10 +124,12 @@ while [ $m -ge 0 ]; do
 		echo Folder Detected
 		for book in *; do
 			if [ -d "$book" ]; then
+				# Get the first audio file to check bitrate
 				mpthree=$(find "$book" -maxdepth 2 -type f \( -name '*.mp3' -o -name '*.m4b' \) | head -n 1)
 				m4bfile="$outputfolder$book/$book$m4bend"
 				logfile="$outputfolder$book/$book$logend"
 				chapters=$(ls "$inputfolder$book"/*chapters.txt 2> /dev/null | wc -l)
+				
 				if [ "$chapters" != "0" ]; then
 					echo Adjusting Chapters
 					mp4chaps -i "$inputfolder""$book"/*$m4bend
@@ -137,20 +139,48 @@ while [ $m -ge 0 ]; do
 					bit=$(ffprobe -hide_banner -loglevel 0 -of flat -i "$mpthree" -select_streams a -show_entries format=bit_rate -of default=noprint_wrappers=1:nokey=1)
 					echo Bitrate = $bit
 					echo The folder "$book" will be merged to "$m4bfile"
+					
+					# Create a temporary directory for renamed files
+					temp_dir="$inputfolder$book/temp_renamed"
+					mkdir -p "$temp_dir"
+					
+					# Find all mp3 files and rename them based on their part numbers
+					find "$book" -type f -name "*.mp3" | while read -r file; do
+						# Extract part number from filename (looking for patterns like "Part 01" or just "01")
+						if [[ $file =~ [Pp]art[[:space:]]*([0-9]+) ]]; then
+							part_num="${BASH_REMATCH[1]}"
+						elif [[ $file =~ [^0-9]([0-9]+)[^0-9] ]]; then
+							part_num="${BASH_REMATCH[1]}"
+						else
+							continue
+						fi
+						
+						# Pad number with leading zeros if needed
+						part_num=$(printf "%02d" "$part_num")
+						
+						# Create new filename
+						new_name="$temp_dir/part_${part_num}.mp3"
+						cp "$file" "$new_name"
+					done
+					
 					echo Starting Conversion
-					m4b-tool merge "$book" -n -q --audio-bitrate="$bit" --skip-cover --use-filenames-as-chapters --no-chapter-reindexing --audio-codec=libfdk_aac --jobs="$CPUcores" --output-file="$m4bfile" --logfile="$logfile"
+					m4b-tool merge "$temp_dir" -n -q --audio-bitrate="$bit" --skip-cover --use-filenames-as-chapters --no-chapter-reindexing --audio-codec=libfdk_aac --jobs="$CPUcores" --output-file="$m4bfile" --logfile="$logfile"
+					
+					# Clean up
+					rm -rf "$temp_dir"
 					mv "$inputfolder$book" "$binfolder"
+					
+					echo Finished Converting
+					#make sure all single file m4b's are in their own folder
+					echo Putting the m4b into a folder
+					for file in $outputfolder*.m4b; do
+						if [[ -f "$file" ]]; then
+							mkdir "${file%.*}"
+							mv "$file" "${file%.*}"
+						fi
+					done
+					echo Deleting duplicate mp3 audiobook folder
 				fi
-				echo Finished Converting
-				#make sure all single file m4b's are in their own folder
-				echo Putting the m4b into a folder
-				for file in $outputfolder*.m4b; do
-					if [[ -f "$file" ]]; then
-						mkdir "${file%.*}"
-						mv "$file" "${file%.*}"
-					fi
-				done
-				echo Deleting duplicate mp3 audiobook folder
 			fi
 		done
 	else
