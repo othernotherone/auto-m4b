@@ -1,0 +1,25 @@
+{
+    "projectName": "auto-m4b",
+    "commands": [
+        {
+            "name": "Docker: Start All",
+            "command": "docker-compose up",
+            "description": "Start all Docker containers"
+        },
+        {
+            "name": "Docker: Start All (Detached)",
+            "command": "docker-compose up -d",
+            "description": "Start all Docker containers in detached mode"
+        },
+        {
+            "name": "Docker: Stop All",
+            "command": "docker-compose down",
+            "description": "Stop all Docker containers"
+        },
+        {
+            "name": "Docker: Start auto-m4b",
+            "command": "docker-compose up auto-m4b",
+            "description": "Start the auto-m4b service"
+        }
+    ]
+}
