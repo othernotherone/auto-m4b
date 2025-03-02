@@ -1,0 +1,7 @@
+# Ignore audiobook conversion files
+/audiobooks/
+/converted/
+/temp/
+/output/
+
+# ... existing code ... 
