@@ -1,3 +1,13 @@
+mv: missing file operand
+Try 'mv --help' for more information.
+mv: missing file operand
+Try 'mv --help' for more information.
+find: ‘standard output’: Broken pipe
+find: write error
+mv: missing file operand
+Try 'mv --help' for more information.
+mv: missing file operand
+Try 'mv --help' for more information.
 cp: cannot stat '/temp/recentlyadded/*': No such file or directory
 dirname: missing operand
 Try 'dirname --help' for more information.
@@ -5,6 +15,9 @@ mv: missing file operand
 Try 'mv --help' for more information.
 mv: missing file operand
 Try 'mv --help' for more information.
+cp: cannot stat '/temp/recentlyadded/*': No such file or directory
+dirname: missing operand
+Try 'dirname --help' for more information.
 mv: missing file operand
 Try 'mv --help' for more information.
 mv: missing file operand
